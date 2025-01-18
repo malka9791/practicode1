@@ -25,10 +25,10 @@ bundleCommand.SetHandler((output, language, note, sort, remove, author) =>
 {
     List<string> codeFiles = new List<string>();
     if (language[0] == "all")
-        codeFiles.AddRange(Directory.GetFiles("\\.", "*", SearchOption.AllDirectories));
+        codeFiles.AddRange(Directory.GetFiles(".\\", "*", SearchOption.AllDirectories));
     else foreach (var l in language)
         {
-            codeFiles.AddRange(Directory.GetFiles("\\.", $"*.{l}", SearchOption.AllDirectories));
+            codeFiles.AddRange(Directory.GetFiles(".\\", $"*.{l}", SearchOption.AllDirectories));
         }
     if (codeFiles.Count == 0)
     {
@@ -52,7 +52,7 @@ bundleCommand.SetHandler((output, language, note, sort, remove, author) =>
         file.WriteLine($"// {author}");
         foreach (var f in codeFiles)
         {
-            if (note)
+            if (note!=null)
             {
                 file.WriteLine($"// path: {Path.GetFullPath(f)}");
                 file.WriteLine($"// file name:{Path.GetFileName(f)}");
@@ -63,7 +63,8 @@ bundleCommand.SetHandler((output, language, note, sort, remove, author) =>
             {
                 lines = lines.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
             }
-            file.WriteLine(lines);
+            foreach (var line in lines)
+            { file.WriteLine(line); }
         }
 
     }
@@ -84,6 +85,7 @@ createRsp.SetHandler(() =>
         Console.WriteLine("enter value for bundle command");
         using (StreamWriter writer = new StreamWriter(writeRsp.FullName))
         {
+            writer.WriteLine("bundle");
             Console.WriteLine("output file path:");
             string o = Console.ReadLine();
             while (string.IsNullOrWhiteSpace(o))
@@ -91,7 +93,7 @@ createRsp.SetHandler(() =>
                 Console.WriteLine("Errror: press output file path");
                 o = Console.ReadLine();
             }
-            writer.Write($"--output {o}");
+            writer.WriteLine($"--output {o}");
             Console.WriteLine("languages file atleast1:");
             string l = Console.ReadLine();
             while (string.IsNullOrWhiteSpace(l))
@@ -99,15 +101,15 @@ createRsp.SetHandler(() =>
                 Console.WriteLine();
                 l = Console.ReadLine();
             }
-            writer.Write($"--language {l}");
+            writer.WriteLine($"--language {l}");
             Console.WriteLine("enter note y/n:");
-            writer.Write(Console.ReadLine().Trim().ToLower() == "y" ? $"--note {true}" : "");
+            writer.WriteLine(Console.ReadLine().Trim().ToLower() == "y" ? $"--note" : "");
             Console.WriteLine("enter remove y/n:");
-            writer.Write(Console.ReadLine().Trim().ToLower() == "y" ? $"--remove {true}" : "");
+            writer.WriteLine(Console.ReadLine().Trim().ToLower() == "y" ? $"--remove" : "");
             Console.WriteLine("enter kind of sort:");
-            writer.Write($"--sort {Console.ReadLine()}");
+            writer.WriteLine($"--sort {Console.ReadLine()}");
             Console.WriteLine("author:");
-            writer.Write($"--author {Console.ReadLine()}");
+            writer.WriteLine($"--author {Console.ReadLine()}");
         }
         Console.WriteLine("file was created");
     }
